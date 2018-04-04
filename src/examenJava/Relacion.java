@@ -18,14 +18,20 @@ public class Relacion {
 	private Schema sc;
 	private Vector[] valor;
 	
+	Relacion(){
+		 valor = new Vector[1];
+		 valor[0] = new Vector(1); 
+	}
 	Relacion(String name , Schema sc){
+		this();
 		this.name = name;
 	    this.sc = sc;
-	    valor = new Vector[1];
-	    valor[0] = new Vector(1); 
+	   
 	}
 	
+	
 	Relacion(String nameFile){
+		this();
 		File archivo = null;
 		FileReader fr = null;
 		BufferedReader br = null;
@@ -40,14 +46,22 @@ public class Relacion {
 			// Lectura del fichero
 			String linea;
 			int cont = 0;
-			String name = "att1,att2,att3";
-			String types = "int,int,int";
-			Schema miSchema = new Schema(name,types);
-			String valor = "1,2,3";
+		
 			
-			while ((linea = br.readLine()) != null) {	
-			        
+			setName(nameFile);
+			
+			while ((linea = br.readLine()) != null) {
 				System.out.println(linea);
+				if(cont == 0){
+					String tipo = br.readLine();
+			        this.setSc(linea, tipo);
+			        //System.out.println(br.readLine());
+			        linea = br.readLine();
+			        
+				    cont++;
+				}
+				this.addInstance(linea);
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -64,14 +78,34 @@ public class Relacion {
 			}
 }
 	}
+	public void setName(String name) {
+		this.name = name;
+	}
+
+   /**
+    * Método par cambia el esquema
+    * @param schema
+    * @param tipos
+    */
+	public void setSc(String schema, String tipos){
+		Schema aux  = new Schema(schema, tipos);
+		this.sc = aux;
+	}
+
+
+	public void setValor(Vector[] valor) {
+		this.valor = valor;
+	}
+
+
 	/**
 	 * Método que crear una instacion nuvea para depsu añadirla
 	 * @param m
 	 */
 	private void addNuevo() {
-		
+
 		Vector[] aux = valor;
-		valor = new Vector[getNumInst()+1];
+		valor = new Vector[getNumInst() + 1];
 		
 		for(int i = 0 ; i < getNumInst() - 1; i++) {
 			valor[i] = aux[i];
@@ -104,8 +138,18 @@ public class Relacion {
 	 * Método que introduce una instancia nueva en la relación.
 	 * @param inst
 	 */
+	public void addInstance(String inst){
+		Vector aux = new  Vector(inst);
+		
+		addInstance(aux);
+	
+	}
+	/**
+	 * Método que introduce una instancia nueva en la relación.
+	 * @param inst
+	 */
 	public void addInstance(Vector inst){
-		System.out.print("Nuevo");
+		
 		addNuevo();
 		valor[getNumInst()-1] = inst;
 	
@@ -127,9 +171,10 @@ public class Relacion {
 		String result = name + "\n";
 		
 		result = result + sc.toString()+ "\n";
-		for(int i = 0; i< this.getNumInst();i++){
+		for(int i = 0; i< this.getNumInst()-1;i++){
 			result = result + valor[i].toString() + "\n";
 		}
+		result = result + valor[this.getNumInst()-1].toString();
 		return result;
     }
     public void print(){
